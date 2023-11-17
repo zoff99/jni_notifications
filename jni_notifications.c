@@ -61,7 +61,7 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1ver
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1notify(JNIEnv *env, jobject thiz,
-    jstring application, jstring title, jstring message)
+    jstring application, jstring title, jstring message, jstring icon_filename_fullpath)
 {
     int ret = 0;
 
@@ -74,8 +74,22 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
     const char *title_cstr = (*env)->GetStringUTFChars(env, title, NULL);
     const char *message_cstr = (*env)->GetStringUTFChars(env, message, NULL);
 
+    const char *icon_filename_fullpath_cstr = NULL;
+    if (icon_filename_fullpath != NULL)
+    {
+        icon_filename_fullpath_cstr = (*env)->GetStringUTFChars(env, icon_filename_fullpath, NULL);
+    }
+
     notify_init(application_cstr);
-    NotifyNotification* notification = notify_notification_new(title_cstr, message_cstr, 0);
+    NotifyNotification* notification = NULL;
+    if (icon_filename_fullpath_cstr != NULL)
+    {
+        notification = notify_notification_new(title_cstr, message_cstr, icon_filename_fullpath_cstr);
+    }
+    else
+    {
+        notification = notify_notification_new(title_cstr, message_cstr, 0);
+    }
     notify_notification_set_timeout(notification, 4000); // 4 seconds
     if (!notify_notification_show(notification, 0))
     {
@@ -94,7 +108,10 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
     {
         (*env)->ReleaseStringUTFChars(env, message, message_cstr);
     }
-
+    if (icon_filename_fullpath != NULL)
+    {
+        (*env)->ReleaseStringUTFChars(env, icon_filename_fullpath, icon_filename_fullpath_cstr);
+    }
     return (jint)ret;
 }
 
