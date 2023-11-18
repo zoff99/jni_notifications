@@ -33,6 +33,7 @@ jobs:
           ca-certificates \
           openjdk-17-jdk \
           openjdk-17-jdk-headless \
+          libnotify-dev \
           coreutils autoconf libtool pkg-config \
           faketime hostname
 
