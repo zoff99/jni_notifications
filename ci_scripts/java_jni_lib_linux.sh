@@ -94,8 +94,9 @@ $(pkg-config --libs --cflags libnotify) \
 -shared \
 -Wl,-soname,libjni_notifications.so -o libjni_notifications.so || exit 1
 
-
+echo "------------------"
 ldd libjni_notifications.so
+echo "------------------"
 ls -al libjni_notifications.so || exit 1
 pwd
 file libjni_notifications.so
