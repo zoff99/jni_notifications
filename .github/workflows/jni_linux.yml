@@ -1,0 +1,70 @@
+name: linux JNI Lib
+
+on:
+  push:
+    paths-ignore:
+     - 'README.md'
+     - 'CHANGELOG.md'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+     - 'CHANGELOG.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+
+  build-linux-nightly-artifact:
+    name: Nightly Artifact linux Build
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install deps
+        run: |
+          sudo apt-get update && \
+          sudo DEBIAN_FRONTEND=noninteractive \
+          apt-get install -y --no-install-recommends \
+          ca-certificates \
+          openjdk-17-jdk \
+          openjdk-17-jdk-headless \
+          coreutils autoconf libtool pkg-config \
+          faketime hostname
+
+      - name: build jni lib
+        run:  |
+          ls -al
+          id
+          pwd
+          hostname
+          domainname
+          sudo hostname "buildhost"
+          hostname
+          domainname
+          faketime '2023-10-10 08:00:00' ./ci_scripts/java_jni_lib_linux.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: libjni_notifications.so
+          path: libjni_notifications.so
+      - name: Upload to nightly release
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "libjni_notifications.so"
+
+
+
