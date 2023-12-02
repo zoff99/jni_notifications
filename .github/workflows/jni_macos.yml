@@ -39,8 +39,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: libjni_notifications_macos.jnilib
-          path: libjni_notifications_macos.jnilib
+          name: libjni_notifications.jnilib
+          path: libjni_notifications.jnilib
       - name: Upload to nightly release
         uses: ncipollo/release-action@v1
         if: github.ref == 'refs/heads/master'
@@ -52,12 +52,6 @@ jobs:
           prerelease: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "libjni_notifications_macos.jnilib"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: test_macos
-          path: test_macos
+          artifacts: "libjni_notifications.jnilib"
 
 

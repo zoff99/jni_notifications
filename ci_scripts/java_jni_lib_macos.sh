@@ -64,6 +64,9 @@ cp -av "$_HOME3_"/jni.h "$_INST_/jinclude/"
 
 export CFLAGS=" -fPIC -g -O3 -std=gnu99 -I$_INST_/include/ -I$_INST_/jinclude/ -L$_INST_/lib -fstack-protector-all "
 
+# gcc -c -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" MyJNIImplementation.m -o MyJNIImplementation.o
+# gcc -dynamiclib -o libmyjni.dylib MyJNIImplementation.o -framework Foundation
+
 gcc $CFLAGS \
 -Wall \
 -Wno-unused-function \
@@ -75,20 +78,23 @@ gcc $CFLAGS \
 -D_FILE_OFFSET_BITS=64 -D__USE_GNU=1 \
 -I$JAVADIR1/ \
 -I$JAVADIR2/ \
-jni_notifications_macos.c \
+jni_notifications_macos.m \
 -lpthread \
 -lm \
 -shared \
--o libjni_notifications_macos.jnilib || exit 1
+-o libjni_notifications.jnilib || exit 1
 
 
-ls -al libjni_notifications_macos.jnilib || exit 1
+ls -al libjni_notifications.jnilib || exit 1
 
-otool -L libjni_notifications_macos.jnilib
+otool -L libjni_notifications.jnilib
 pwd
-file libjni_notifications_macos.jnilib
+file libjni_notifications.jnilib
 
 pwd
-find . -name libjni_notifications_macos.jnilib
+find . -name libjni_notifications.jnilib
+
+java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
+
 
 
