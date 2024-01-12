@@ -74,9 +74,11 @@ echo "JAVADIR2:""$JAVADIR2"
 
 export CFLAGS=" -fPIC -O3 -g -std=gnu99 -fstack-protector-all -D_FORTIFY_SOURCE=2 "
 
+# -fsanitize=address -fno-omit-frame-pointer -fsanitize-recover=address \
 
 faketime "2023-10-10 08:00:00" gcc $CFLAGS \
 -Wall \
+-fsanitize=address -fno-omit-frame-pointer -fsanitize-recover=address -static-libasan \
 -Wno-unused-function \
 -Wno-discarded-qualifiers \
 -Wno-unused-const-variable \

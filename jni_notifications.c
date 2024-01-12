@@ -9,8 +9,9 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 0
-static const char global_version_string[] = "0.99.0";
+#define VERSION_PATCH 1
+static const char global_version_string[] = "0.99.1";
+static const char global_version_asan_string[] = "0.99.1-ASAN";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -56,7 +57,11 @@ int java_find_class_global(char *name, jclass *ret)
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1version(JNIEnv *env, jobject thiz)
 {
+#if defined(__SANITIZE_ADDRESS__)
+    return (*env)->NewStringUTF(env, global_version_asan_string);
+#else
     return (*env)->NewStringUTF(env, global_version_string);
+#endif
 }
 
 JNIEXPORT jint JNICALL
