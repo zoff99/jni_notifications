@@ -42,10 +42,10 @@ jobs:
 
       - name: sha hash of jni lib
         run:  |
-          sha256sum /home/runner/work/ffmpeg_av_jni/ffmpeg_av_jni/libjni_notifications.so || echo "ignore"
+          sha256sum /home/runner/work/jni_notifications/jni_notifications/libjni_notifications.so || echo "ignore"
 
       - name: rename lib
-        run: cp -av /home/runner/work/ffmpeg_av_jni/ffmpeg_av_jni/libjni_notifications.so libjni_notifications_raspi.so
+        run: cp -av /home/runner/work/jni_notifications/jni_notifications/libjni_notifications.so libjni_notifications_raspi.so
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
