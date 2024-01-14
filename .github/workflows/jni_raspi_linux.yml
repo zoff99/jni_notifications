@@ -1,0 +1,67 @@
+name: raspi linux JNI Lib
+
+on:
+  push:
+    paths-ignore:
+     - 'README.md'
+     - 'CHANGELOG.md'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+     - 'CHANGELOG.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+
+  build-raspi-jni-artifact:
+    name: JNI Artifact Raspi Build
+    runs-on: ubuntu-22.04
+    if: |
+      true
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: make script dockcross-linux-arm64
+        run: docker run --rm dockcross/linux-arm64 > ./dockcross-linux-arm64; chmod +x ./dockcross-linux-arm64
+
+      - name: test
+        run: ./dockcross-linux-arm64 bash -c 'ls -al;id;pwd;hostname;uname -a'
+
+      - name: build deps and jni lib
+        run:  |
+          ./dockcross-linux-arm64 bash -c 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openjdk-17-jdk openjdk-17-jdk-headless coreutils autoconf libtool pkg-config libx11-xcb-dev libpulse-dev alsa-utils libasound2-dev v4l-utils libv4l-dev v4l-conf libxcb-shm0-dev libxcb-shape0-dev libxcb-xfixes0-dev ; ./ci_scripts/java_jni_lib_linux.sh raspi'
+
+      - name: find lib
+        run: pwd; find . -name libjni_notifications.so
+
+      - name: sha hash of jni lib
+        run:  |
+          sha256sum /home/runner/work/ffmpeg_av_jni/ffmpeg_av_jni/libjni_notifications.so || echo "ignore"
+
+      - name: rename lib
+        run: cp -av /home/runner/work/ffmpeg_av_jni/ffmpeg_av_jni/libjni_notifications.so libjni_notifications_raspi.so
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: libjni_notifications_raspi.so
+          path: libjni_notifications_raspi.so
+      - name: Upload to nightly release
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "libjni_notifications_raspi.so"
+
