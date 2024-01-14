@@ -35,7 +35,7 @@ jobs:
 
       - name: build deps and jni lib
         run:  |
-          ./dockcross-linux-arm64 bash -c 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openjdk-17-jdk openjdk-17-jdk-headless coreutils autoconf libtool pkg-config libx11-xcb-dev libpulse-dev alsa-utils libasound2-dev v4l-utils libv4l-dev v4l-conf libxcb-shm0-dev libxcb-shape0-dev libxcb-xfixes0-dev ; ./ci_scripts/java_jni_lib_linux.sh raspi'
+          ./dockcross-linux-arm64 bash -c 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libnotify-dev openjdk-17-jdk openjdk-17-jdk-headless coreutils autoconf libtool pkg-config libx11-xcb-dev libpulse-dev alsa-utils libasound2-dev v4l-utils libv4l-dev v4l-conf libxcb-shm0-dev libxcb-shape0-dev libxcb-xfixes0-dev ; ./ci_scripts/java_jni_lib_linux.sh raspi'
 
       - name: find lib
         run: pwd; find . -name libjni_notifications.so
