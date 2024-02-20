@@ -1,0 +1,23 @@
+[package]
+name = "jni_notifications"
+version = "0.99.0"
+authors = ["Zoff"]
+edition = "2021"
+
+[dependencies]
+jni = "0.21.1"
+libnotify = "1.0.3"
+# cfg-if = "1.0.0"
+# cesu8 = "1.1.0"
+# combine = "4.1.0"
+# java-locator = { version = "0.1", optional = true }
+# jni-sys = "0.4"
+# libloading = { version = "0.8", optional = true }
+# log = "0.4.4"
+# static_assertions = "1"
+# thiserror = "1.0.20"
+
+[lib]
+path = "jni_notifications.rs"
+crate_type = ["cdylib"]
+
