@@ -23,7 +23,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: install deps
         run: |
@@ -50,7 +50,7 @@ jobs:
           faketime '2023-10-10 08:00:00' ./ci_scripts/java_jni_lib_linux.sh
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: libjni_notifications.so
           path: libjni_notifications.so
