@@ -59,6 +59,7 @@ ls -al
 
 ## ---------------------------
 
+source "$HOME/.cargo/env"
 cargo build --release
 mv -v target/release/libjni_notifications.so ./libjni_notifications_rs.so
 

@@ -19,7 +19,7 @@ jobs:
 
   build-linux-nightly-artifact:
     name: Nightly Artifact linux Build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     permissions:
       contents: write
     steps:
@@ -34,8 +34,14 @@ jobs:
           openjdk-17-jdk \
           openjdk-17-jdk-headless \
           libnotify-dev \
+          curl \
           coreutils autoconf libtool pkg-config \
           faketime hostname
+
+      - name: install rust
+        run: |
+          curl https://sh.rustup.rs -sSf > a.sh
+          bash a.sh -y
 
       - name: build jni lib
         run:  |
