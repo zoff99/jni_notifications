@@ -1,4 +1,4 @@
-name: linux JNI Lib
+name: linux JNI Lib rs
 
 on:
   push:
