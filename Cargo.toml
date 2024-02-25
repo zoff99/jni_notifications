@@ -21,3 +21,7 @@ libnotify = "1.0.3"
 path = "jni_notifications.rs"
 crate_type = ["cdylib"]
 
+[profile.release]
+strip = true
+# lto = true
+# codegen-units = 1
