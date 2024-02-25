@@ -64,14 +64,14 @@ find . -name "*so"
 ldd ./outlib/release/libjni_notifications.so
 ls -hal ./outlib/release/libjni_notifications.so
 
-cp -av ./outlib/release/libjni_notifications.so libjni_notifications.so
+cp -av ./outlib/release/libjni_notifications.so libjni_notifications_rs.so
 
 pwd
-ls -al libjni_notifications.so || exit 1
-file libjni_notifications.so
-ls -hal libjni_notifications.so
+ls -al libjni_notifications_rs.so || exit 1
+file libjni_notifications_rs.so
+ls -hal libjni_notifications_rs.so
 
-cp -v libjni_notifications.so /artefacts/ || exit 1
+cp -v libjni_notifications_rs.so /artefacts/ || exit 1
 
 chmod a+rw /artefacts/*
 
