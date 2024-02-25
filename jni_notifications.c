@@ -93,9 +93,9 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
     }
     else
     {
-        notification = notify_notification_new(title_cstr, message_cstr, 0);
+        notification = notify_notification_new(title_cstr, message_cstr, NULL);
     }
-    notify_notification_set_timeout(notification, 4000); // 4 seconds
+    notify_notification_set_timeout(notification, NOTIFY_EXPIRES_DEFAULT);
     if (!notify_notification_show(notification, 0))
     {
         ret = -2;
