@@ -1,3 +1,5 @@
 .vscode/
+target/
+Cargo.lock
 tt.sh
-targetCargo.lock
+tt_rs.sh
