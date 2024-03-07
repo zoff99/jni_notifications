@@ -56,7 +56,8 @@ export WGET_OPTIONS
 ## ---------------------------
 pwd
 ls -al
-
+libjni_notifications*
+ls -al
 ## ---------------------------
 
 echo "JAVADIR1------------------"
@@ -101,3 +102,4 @@ ls -al libjni_notifications.so || exit 1
 pwd
 file libjni_notifications.so
 
+java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
