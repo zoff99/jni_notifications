@@ -56,7 +56,8 @@ export WGET_OPTIONS
 ## ---------------------------
 pwd
 ls -al
-
+libjni_notifications*
+ls -al
 ## ---------------------------
 
 source "$HOME/.cargo/env"
@@ -69,4 +70,9 @@ echo "------------------"
 ls -al libjni_notifications_rs.so || exit 1
 pwd
 file libjni_notifications_rs.so
+
+# copy the rust library over the normal linux library, so the test will use the rust library
+cp -av libjni_notifications_rs.so libjni_notifications.so
+
+java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
 
