@@ -42,7 +42,7 @@ export WGET_OPTIONS
 ## ---------------------------
 pwd
 ls -al
-libjni_notifications*
+rm -fv libjni_notifications*
 ls -al
 ## ---------------------------
 
