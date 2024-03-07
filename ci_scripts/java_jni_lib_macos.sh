@@ -93,6 +93,8 @@ file libjni_notifications.jnilib
 
 pwd
 find . -name libjni_notifications.jnilib
+# copy also to the mac M1 name for testing on that platform (its a bit of a hack)
+cp -av libjni_notifications.jnilib libjni_notifications_arm64.jnilib
 
 java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
 
