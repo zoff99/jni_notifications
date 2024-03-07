@@ -42,6 +42,8 @@ export WGET_OPTIONS
 ## ---------------------------
 pwd
 ls -al
+libjni_notifications*
+ls -al
 ## ---------------------------
 
 echo "JAVADIR1------------------"
