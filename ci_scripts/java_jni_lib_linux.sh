@@ -75,13 +75,18 @@ export JAVADIR2=$(cat /tmp/xx2)
 echo "JAVADIR1:""$JAVADIR1"
 echo "JAVADIR2:""$JAVADIR2"
 
-
 CFLAGS_ADDON='-O2 -g -fPIC'
 CFLAGS_MORE="-fdebug-prefix-map=/home/runner/work/jni_notifications/jni_notifications=/ --param=ssp-buffer-size=1 -fstack-protector-all -D_FORTIFY_SOURCE=2 -std=gnu99"
 
+if [ "$2""x" == "asanx" ]; then
+    ASAN_FLAGS="-fsanitize=address -fno-omit-frame-pointer -fsanitize-recover=address -static-libasan"
+else
+    ASAN_FLAGS=""
+fi
 
 gcc \
 $CFLAGS_ADDON $CFLAGS_MORE \
+$ASAN_FLAGS \
 -Wall \
 -Wno-unused-function \
 -Wno-discarded-qualifiers \
@@ -100,6 +105,18 @@ ldd libjni_notifications.so
 echo "------------------"
 ls -al libjni_notifications.so || exit 1
 pwd
+
+# check if we actually have ASAN symbols in the library file
+nm libjni_notifications.so | grep -i asan || exit 1
+
 file libjni_notifications.so
 
-java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
+
+if [ "$2""x" == "asanx" ]; then
+    ls -al /usr/lib/x86_64-linux-gnu/libasan*
+    export ASAN_OPTIONS="detect_leaks=0,halt_on_error=true"
+    LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.6.0.0 java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
+else
+    java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
+fi
+
