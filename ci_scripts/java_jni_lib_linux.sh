@@ -106,8 +106,10 @@ echo "------------------"
 ls -al libjni_notifications.so || exit 1
 pwd
 
-# check if we actually have ASAN symbols in the library file
-nm libjni_notifications.so | grep -i asan || exit 1
+if [ "$2""x" == "asanx" ]; then
+    # check if we actually have ASAN symbols in the library file
+    nm libjni_notifications.so | grep -i asan || exit 1
+fi
 
 file libjni_notifications.so
 
