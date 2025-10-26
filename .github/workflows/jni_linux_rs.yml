@@ -19,7 +19,7 @@ jobs:
 
   build-linux-nightly-artifact:
     name: Nightly Artifact linux Build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
     steps:
