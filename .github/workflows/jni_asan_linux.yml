@@ -55,7 +55,7 @@ jobs:
           mv -v libjni_notifications.so libjni_notifications.so__ASAN
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: libjni_notifications.so__ASAN
           path: libjni_notifications.so__ASAN
