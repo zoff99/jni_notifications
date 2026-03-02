@@ -42,7 +42,7 @@ jobs:
           cp -v libjni_notifications.jnilib libjni_notifications_arm64.jnilib
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: libjni_notifications_arm64.jnilib
           path: libjni_notifications_arm64.jnilib
