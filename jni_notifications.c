@@ -125,14 +125,9 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
 
     notify_notification_set_timeout(notification, NOTIFY_EXPIRES_DEFAULT);
 
-    // FIX: Capture errors to know WHY it failed
-    GError *error = NULL;
-    if (!notify_notification_show(notification, &error))
+    // HINT: pass NULL for error argument, as we are not interested in it. and don't want alloc and free here
+    if (!notify_notification_show(notification, NULL))
     {
-        if (error) {
-            // fprintf(stderr, "Notification failed: %s\n", error->message);
-            g_error_free(error);
-        }
         ret = -2;
     }
 
