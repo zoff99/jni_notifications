@@ -140,14 +140,20 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
 
 cleanup:
     // Release strings only if they were successfully allocated
-    if (application_cstr != NULL)
+    if (application_cstr != NULL) {
         (*env)->ReleaseStringUTFChars(env, application, application_cstr);
-    if (title_cstr != NULL)
+    }
+    if (title_cstr != NULL) {
         (*env)->ReleaseStringUTFChars(env, title, title_cstr);
-    if (message_cstr != NULL)
+    }
+    if (message_cstr != NULL) {
         (*env)->ReleaseStringUTFChars(env, message, message_cstr);
-    if (icon_filename_fullpath_cstr != NULL)
-        (*env)->ReleaseStringUTFChars(env, icon_filename_fullpath, icon_filename_fullpath_cstr);
+    }
+    if (icon_filename_fullpath != NULL) {
+        if (icon_filename_fullpath_cstr != NULL) {
+            (*env)->ReleaseStringUTFChars(env, icon_filename_fullpath, icon_filename_fullpath_cstr);
+        }
+    }
 
     return (jint)ret;
 }
