@@ -18,28 +18,23 @@ static const char global_version_asan_string[] = "0.99.2-ASAN";
 extern "C" {
 #endif
 
-// Removed unused global 'JNIEnv *jnienv;'
 JavaVM *cachedJVM = NULL;
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
     JNIEnv *env_this = NULL;
     cachedJVM = jvm;
-    // Explicitly check for JNI_OK for readability
     if((*jvm)->GetEnv(jvm, (void **) &env_this, JNI_VERSION_1_6) != JNI_OK)
     {
         return JNI_ERR;
     }
-
-    // Optional: Initialize notify here once for the whole app lifecycle
-    // notify_init("MyJavaApp");
 
     return JNI_VERSION_1_6;
 }
 
 JNIEnv *jni_getenv()
 {
-    JNIEnv *env_this = NULL; // Initialize to NULL to prevent garbage returns
+    JNIEnv *env_this = NULL;
     if (cachedJVM != NULL) {
         // GetEnv returns JNI_OK on success. If it fails (e.g., thread detached), env_this remains NULL.
         (*cachedJVM)->GetEnv(cachedJVM, (void **) &env_this, JNI_VERSION_1_6);
@@ -50,7 +45,9 @@ JNIEnv *jni_getenv()
 int java_find_class_global(char *name, jclass *ret)
 {
     JNIEnv *jnienv2 = jni_getenv();
-    if (jnienv2 == NULL) return 0; // Safety check
+    if (jnienv2 == NULL) {
+        return 0;
+    }
 
     *ret = (*jnienv2)->FindClass(jnienv2, name);
     if(!*ret)
@@ -97,6 +94,10 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
     if (icon_filename_fullpath != NULL)
     {
         icon_filename_fullpath_cstr = (*env)->GetStringUTFChars(env, icon_filename_fullpath, NULL);
+        if (!icon_filename_fullpath_cstr) {
+            ret = -6;
+            goto cleanup;
+        }
     }
 
     // FIX: Check if already initialized to avoid redundant/thread-unsafe calls
