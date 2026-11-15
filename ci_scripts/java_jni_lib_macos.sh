@@ -70,6 +70,7 @@ export CFLAGS=" -fPIC -g -O3 -std=gnu99 -I$_INST_/include/ -I$_INST_/jinclude/ -
 # gcc -dynamiclib -o libmyjni.dylib MyJNIImplementation.o -framework Foundation
 
 gcc $CFLAGS \
+-arch $(uname -m) \
 -Wall \
 -Wno-unused-function \
 -Wno-discarded-qualifiers \
@@ -95,8 +96,6 @@ file libjni_notifications.jnilib
 
 pwd
 find . -name libjni_notifications.jnilib
-# copy also to the mac M1 name for testing on that platform (its a bit of a hack)
-cp -av libjni_notifications.jnilib libjni_notifications_arm64.jnilib
 
 java -cp . -Djava.library.path=$(pwd) com.zoffcc.applications.jninotifications.NTFYActivity
 
