@@ -69,8 +69,10 @@ gcc $CFLAGS \
 -Wno-discarded-qualifiers \
 -Wno-unused-const-variable \
 -Wno-deprecated-declarations \
+-framework Foundation \
 -framework UserNotifications \
 -framework CoreFoundation \
+-framework CoreServices \
 -D_FILE_OFFSET_BITS=64 -D__USE_GNU=1 \
 -I$JAVADIR1/ \
 -I$JAVADIR2/ \

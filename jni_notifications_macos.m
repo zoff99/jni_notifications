@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
+#import <CoreFoundation/CoreFoundation.h>
+#import <CoreServices/CoreServices.h>
 #import <jni.h>
 
 // ----------- version -----------
@@ -24,29 +26,42 @@ static const char global_version_string[] = "0.99.2";
 @end
 
 static JNINotificationsDelegate *g_delegate = nil;
+static UNUserNotificationCenter *g_center = nil;
 static BOOL g_init_failed = NO;
 
 static void jninotifications_init_once(void) {
     static dispatch_once_t once_token;
     dispatch_once(&once_token, ^{
-        // Guard: UNUserNotificationCenter requires a registered app bundle.
-        // If loaded outside a .app (e.g. bare JVM), mainBundle.bundleIdentifier
-        // is nil and currentNotificationCenter throws an NSInternalInconsistencyException.
-        NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
-        if (bundleId == nil || [bundleId length] == 0) {
+        // Stage 1: CFBundle checks (no exceptions possible)
+        CFBundleRef mainBundle = CFBundleGetMainBundle();
+        if (mainBundle == NULL) {
+            g_init_failed = YES;
+            return;
+        }
+        CFStringRef bundleId = CFBundleGetIdentifier(mainBundle);
+        if (bundleId == NULL || CFStringGetLength(bundleId) == 0) {
             g_init_failed = YES;
             return;
         }
 
-        @try {
-            g_delegate = [[JNINotificationsDelegate alloc] init];
-            [UNUserNotificationCenter currentNotificationCenter].delegate = g_delegate;
-        } @catch (NSException *exception) {
-            // Catches "bundleProxyForCurrentProcess is nil" and any other
-            // framework-level assertion if the bundle exists but isn't registered
+        // Stage 2: Verify the bundle is actually registered with LaunchServices.
+        // The JDK java binary has an embedded Info.plist with a bundle identifier,
+        // so CFBundleGetIdentifier returns non-NULL even for bare JVM processes.
+        // But LaunchServices has no bundle proxy for it, causing
+        // UNUserNotificationCenter to throw NSInternalInconsistencyException.
+        // LSFindApplicationForInfo returns kApplicationNotFound for unregistered bundles.
+        CFURLRef appURL = NULL;
+        OSStatus status = LSFindApplicationForInfo(kLSUnknownCreator, bundleId, NULL, NULL, &appURL);
+        if (status != noErr || appURL == NULL) {
             g_init_failed = YES;
-            g_delegate = nil;
+            return;
         }
+        CFRelease(appURL);
+
+        // Only reached for genuinely registered .app bundles
+        g_delegate = [[JNINotificationsDelegate alloc] init];
+        g_center = [UNUserNotificationCenter currentNotificationCenter];
+        g_center.delegate = g_delegate;
     });
 }
 
@@ -96,8 +111,8 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
     @autoreleasepool {
         jninotifications_init_once();
 
-        // Guard: not running inside a valid app bundle
-        if (g_init_failed) {
+        // Guard: not running inside a valid registered app bundle
+        if (g_init_failed || g_center == nil) {
             free(title_copy);
             free(message_copy);
             return -1;
@@ -109,11 +124,9 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
         free(title_copy);
         free(message_copy);
 
-        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+        // Use cached center reference — never call currentNotificationCenter again
+        UNUserNotificationCenter *center = g_center;
 
-        // FIX: Check auth status SYNCHRONOUSLY first, only deliver if authorized.
-        // If not determined, request auth and deliver in the completion handler
-        // so the first notification is never silently dropped.
         [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *settings) {
             void (^deliverBlock)(void) = ^{
                 UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -134,7 +147,6 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
             switch (settings.authorizationStatus) {
                 case UNAuthorizationStatusAuthorized:
                 case UNAuthorizationStatusProvisional:
-                case UNAuthorizationStatusEphemeral:
                     deliverBlock();
                     break;
 
