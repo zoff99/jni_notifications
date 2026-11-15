@@ -36,11 +36,6 @@ jobs:
           pwd
           ./ci_scripts/java_jni_lib_macos_arm64.sh
 
-      - name: Rename artifact for nightly upload
-        run: |
-          pwd
-          cp -v libjni_notifications.jnilib libjni_notifications_arm64.jnilib
-
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
