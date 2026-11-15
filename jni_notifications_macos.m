@@ -24,12 +24,29 @@ static const char global_version_string[] = "0.99.2";
 @end
 
 static JNINotificationsDelegate *g_delegate = nil;
+static BOOL g_init_failed = NO;
 
 static void jninotifications_init_once(void) {
     static dispatch_once_t once_token;
     dispatch_once(&once_token, ^{
-        g_delegate = [[JNINotificationsDelegate alloc] init];
-        [UNUserNotificationCenter currentNotificationCenter].delegate = g_delegate;
+        // Guard: UNUserNotificationCenter requires a registered app bundle.
+        // If loaded outside a .app (e.g. bare JVM), mainBundle.bundleIdentifier
+        // is nil and currentNotificationCenter throws an NSInternalInconsistencyException.
+        NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
+        if (bundleId == nil || [bundleId length] == 0) {
+            g_init_failed = YES;
+            return;
+        }
+
+        @try {
+            g_delegate = [[JNINotificationsDelegate alloc] init];
+            [UNUserNotificationCenter currentNotificationCenter].delegate = g_delegate;
+        } @catch (NSException *exception) {
+            // Catches "bundleProxyForCurrentProcess is nil" and any other
+            // framework-level assertion if the bundle exists but isn't registered
+            g_init_failed = YES;
+            g_delegate = nil;
+        }
     });
 }
 
@@ -52,7 +69,7 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
     const char *title_cstr = (*env)->GetStringUTFChars(env, title, NULL);
     const char *message_cstr = (*env)->GetStringUTFChars(env, message, NULL);
 
-    // FIX: Guard against OOM / invalid strings from JNI
+    // Guard against OOM / invalid strings from JNI
     if ((title_cstr == NULL) || (message_cstr == NULL)) {
         if (title_cstr != NULL) {
             (*env)->ReleaseStringUTFChars(env, title, title_cstr);
@@ -78,6 +95,13 @@ Java_com_zoffcc_applications_jninotifications_NTFYActivity_jninotifications_1not
 
     @autoreleasepool {
         jninotifications_init_once();
+
+        // Guard: not running inside a valid app bundle
+        if (g_init_failed) {
+            free(title_copy);
+            free(message_copy);
+            return -1;
+        }
 
         NSString *nsTitle = [NSString stringWithUTF8String:title_copy];
         NSString *nsMessage = [NSString stringWithUTF8String:message_copy];
